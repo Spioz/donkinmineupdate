@@ -25,14 +25,14 @@ export default async function handler(req, res) {
           messages: [
             {
               role: 'system',
-              content: 'You are a news researcher. Search for the latest news and provide a concise summary with sources.'
+              content: 'You are a news researcher. Search for the latest news and provide a concise summary.'
             },
             {
               role: 'user',
-              content: `Find the latest news about "${term}" from the past 24 hours. Include sources and URLs if available. Focus on new developments, sales updates, or investor activity.`
+              content: `Find the latest news about "${term}" from the past 24 hours. Focus on new developments, sales updates, or investor activity.`
             }
           ],
-          max_tokens: 800,
+          max_tokens: 500,
           temperature: 0.2,
           stream: false
         })
@@ -41,23 +41,21 @@ export default async function handler(req, res) {
       const data = await response.json();
       
       if (data.choices && data.choices[0]) {
-        const content = data.choices[0].message.content;
         results.push({
           searchTerm: term,
-          summary: content,
+          summary: data.choices[0].message.content,
           timestamp: new Date().toISOString(),
-          hasNewInfo: content.length > 100 && !content.includes('No recent news') && !content.includes('no new developments'),
-          id: Date.now() + Math.random()
+          hasNewInfo: data.choices[0].message.content.length > 100
         });
       }
 
-      // Rate limiting - wait 2 seconds between requests
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Rate limiting - wait 1 second between requests
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     res.status(200).json({ results });
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({ error: 'Search failed: ' + error.message });
+    res.status(500).json({ error: 'Search failed' });
   }
 }
