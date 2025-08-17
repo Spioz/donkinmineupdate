@@ -1,13 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/daily-check",
+      "path": "/api/cron",
       "schedule": "0 9 * * *"
     }
-  ],
-  "functions": {
-    "pages/api/*.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
